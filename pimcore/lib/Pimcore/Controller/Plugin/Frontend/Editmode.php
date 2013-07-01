@@ -86,15 +86,15 @@ class Pimcore_Controller_Plugin_Frontend_Editmode extends Zend_Controller_Plugin
 
             $body = $this->getResponse()->getBody();
 
-            // prevent loading the jQuery library in editmode if it was already included (overwrites existing plugins)
-            if (!preg_match('/<script(.*?)src="(.*?)\/jquery(\-[0-9\.]+)?(\.min)?\.js/', $body)) {
-                array_unshift($editmodeLibraries, '/pimcore/static/js/lib/jquery.min.js');
-            }
-
             // add html headers for snippets in editmode, so there is no problem with javascript
             if (strpos($body, "</body>") === false && !$request->getParam("blockAutoHtml")) {
                 $body = "<!DOCTYPE html>\n<html>\n<head></head><body>" . $body . "</body></html>";
                 $this->getResponse()->setBody($body);
+            }
+
+            // Prevent loading the jQuery library in editmode if it was already included (overwrites existing plugins)
+            if (!preg_match('/<script(.*?)src="(.*?)\/jquery(\-[0-9\.]+)?(\.min)?\.js(.*?)<\/head>/si', $body)) {
+                array_unshift($editmodeLibraries, '/pimcore/static/js/lib/jquery.min.js');
             }
         }
         
